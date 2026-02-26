@@ -7,6 +7,7 @@ import axios from 'axios'
 import { useUserStore } from '@/stores/user'
 import i18n from './locales'
 
+// @ts-ignore
 import App from './App.vue'
 import router from './router'
 import './assets/css/global.scss'
