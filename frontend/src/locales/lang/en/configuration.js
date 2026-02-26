@@ -113,6 +113,8 @@ export default {
       anthropic: 'Anthropic',
       google_gemini: 'Google Gemini',
       deepseek: 'DeepSeek',
+      qwen: 'Qwen',
+      kimi: 'Moonshot AI',
       siliconflow: 'SiliconFlow',
       zhipu: 'Zhipu AI',
       other: 'Other'
@@ -178,6 +180,7 @@ export default {
     modelTypes: {
       deepseek: 'DeepSeek',
       qwen: 'Qwen',
+      kimi: 'Moonshot AI',
       siliconflow: 'SiliconFlow',
       zhipu: 'Zhipu AI',
       other: 'Other'

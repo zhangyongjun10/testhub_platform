@@ -596,11 +596,14 @@ class AIServiceConfig(models.Model):
     """AI服务配置模型"""
     SERVICE_TYPE_CHOICES = [
         ('openai', 'OpenAI'),
-        ('azure', 'Azure OpenAI'),
+        ('azure_openai', 'Azure OpenAI'),
         ('anthropic', 'Anthropic'),
+        ('google_gemini', 'Google Gemini'),
         ('deepseek', 'DeepSeek'),
         ('qwen', '通义千问'),
+        ('kimi', '月之暗面'),
         ('siliconflow', '硅基流动'),
+        ('zhipu', '智谱AI'),
         ('other', '其他'),
     ]
 

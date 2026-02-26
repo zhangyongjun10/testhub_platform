@@ -91,17 +91,15 @@
 
             <div class="form-group">
               <label>{{ $t('configuration.aiMode.modelProvider') }} <span class="required">*</span></label>
-              <select
-                v-model="configForm.model_type"
-                class="form-select"
-                required
-                @change="onModelTypeChange">
+              <select v-model="configForm.model_type" class="form-select" required @change="onModelTypeChange">
                 <option value="">{{ $t('configuration.aiMode.selectProvider') }}</option>
                 <option value="openai">{{ $t('configuration.aiMode.providers.openai') }}</option>
                 <option value="azure_openai">{{ $t('configuration.aiMode.providers.azure_openai') }}</option>
                 <option value="anthropic">{{ $t('configuration.aiMode.providers.anthropic') }}</option>
                 <option value="google_gemini">{{ $t('configuration.aiMode.providers.google_gemini') }}</option>
                 <option value="deepseek">{{ $t('configuration.aiMode.providers.deepseek') }}</option>
+                <option value="qwen">{{ $t('configuration.aiMode.providers.qwen') }}</option>
+                <option value="kimi">{{ $t('configuration.aiMode.providers.kimi') }}</option>
                 <option value="siliconflow">{{ $t('configuration.aiMode.providers.siliconflow') }}</option>
                 <option value="zhipu">{{ $t('configuration.aiMode.providers.zhipu') }}</option>
                 <option value="other">{{ $t('configuration.aiMode.providers.other') }}</option>
@@ -230,6 +228,8 @@ const modelBaseUrlMap = {
   anthropic: 'https://api.anthropic.com',
   google_gemini: '',
   deepseek: 'https://api.deepseek.com',
+  qwen: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+  kimi: 'https://api.moonshot.cn/v1',
   siliconflow: 'https://api.siliconflow.cn/v1',
   zhipu: 'https://open.bigmodel.cn/api/paas/v4',
   other: ''

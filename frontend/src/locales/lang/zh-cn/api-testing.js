@@ -617,6 +617,7 @@ export default {
       anthropic: 'Anthropic',
       deepseek: 'DeepSeek',
       qwen: '通义千问',
+      kimi: '月之暗面',
       siliconflow: '硅基流动',
       other: '其他'
     },
@@ -675,16 +676,7 @@ export default {
         encryption: '加密',
         datetime: '时间日期',
         crontab: 'Crontab',
-        uncategorized: '未分类',
-        // 中文分类名称映射（用于API返回的中文分类名称）
-        '随机数': '随机数',
-        '测试数据': '测试数据',
-        '字符串': '字符串',
-        '编码转换': '编码转换',
-        '加密': '加密',
-        '时间日期': '时间日期',
-        'crontab': 'Crontab',
-        '未分类': '未分类'
+        uncategorized: '未分类'
       },
       // 变量描述
       variables: {

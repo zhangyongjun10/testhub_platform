@@ -256,6 +256,7 @@ export default {
     passed: 'Passed',
     failed: 'Failed',
     expected: 'Expected:',
+    // @ts-ignore
     actual: 'Actual:',
     error: 'Error:',
     notSet: 'Not set',
@@ -602,11 +603,14 @@ export default {
     save: 'Save',
     serviceTypes: {
       openai: 'OpenAI',
-      azure: 'Azure OpenAI',
+      azure_openai: 'Azure OpenAI',
       anthropic: 'Anthropic',
+      google_gemini: 'Google Gemini',
       deepseek: 'DeepSeek',
       qwen: 'Qwen',
+      kimi: 'Moonshot AI',
       siliconflow: 'SiliconFlow',
+      zhipu: 'Zhipu AI',
       other: 'Other'
     },
     roleTypes: {
@@ -664,16 +668,16 @@ export default {
         encryption: 'Encryption',
         datetime: 'Date & Time',
         crontab: 'Crontab',
-        uncategorized: 'Uncategorized',
-        // English category name mapping (for API returned English category names)
-        'random numbers': 'Random Numbers',
-        'test data': 'Test Data',
-        'string': 'String',
-        'encoding conversion': 'Encoding Conversion',
-        'encryption': 'Encryption',
-        'date & time': 'Date & Time',
-        'crontab': 'Crontab',
-        'uncategorized': 'Uncategorized'
+        uncategorized: 'Uncategorized'
+        // // English category name mapping (for API returned English category names)
+        // 'random numbers': 'Random Numbers',
+        // 'test data': 'Test Data',
+        // 'string': 'String',
+        // 'encoding conversion': 'Encoding Conversion',
+        // 'encryption': 'Encryption',
+        // 'date & time': 'Date & Time',
+        // 'crontab': 'Crontab',
+        // 'uncategorized': 'Uncategorized'
       },
       // Variable descriptions
       variables: {

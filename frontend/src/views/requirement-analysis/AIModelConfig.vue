@@ -124,6 +124,7 @@
                 <option value="">{{ $t('configuration.aiModel.selectModelType') }}</option>
                 <option value="deepseek">{{ $t('configuration.aiModel.modelTypes.deepseek') }}</option>
                 <option value="qwen">{{ $t('configuration.aiModel.modelTypes.qwen') }}</option>
+                <option value="kimi">{{ $t('configuration.aiModel.modelTypes.kimi') }}</option>
                 <option value="siliconflow">{{ $t('configuration.aiModel.modelTypes.siliconflow') }}</option>
                 <option value="zhipu">{{ $t('configuration.aiModel.modelTypes.zhipu') }}</option>
                 <option value="other">{{ $t('configuration.aiModel.modelTypes.other') }}</option>
@@ -189,7 +190,7 @@
                   v-model.number="configForm.max_tokens"
                   type="number"
                   min="100"
-                  max="32000"
+                  max="130000"
                   class="form-input"
                   placeholder="4096">
               </div>
@@ -309,6 +310,7 @@ export default {
       modelBaseUrlMap: {
         deepseek: 'https://api.deepseek.com',
         qwen: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+        kimi: 'https://api.moonshot.cn/v1',
         siliconflow: 'https://api.siliconflow.cn/v1',
         zhipu: 'https://open.bigmodel.cn/api/paas/v4',
         other: ''

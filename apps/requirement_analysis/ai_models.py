@@ -18,12 +18,18 @@ logger = logging.getLogger(__name__)
 class AIModelConfig(models.Model):
     """AI模型配置模型"""
     MODEL_CHOICES = [
+        ('openai', 'OpenAI'),
+        ('azure_openai', 'Azure OpenAI'),
+        ('anthropic', 'Anthropic'),
+        ('google_gemini', 'Google Gemini'),
         ('deepseek', 'DeepSeek'),
         ('qwen', '通义千问'),
+        ('kimi', '月之暗面'),
         ('siliconflow', '硅基流动'),
+        ('zhipu', '智谱AI'),
         ('other', '其他'),
     ]
-    
+
     ROLE_CHOICES = [
         ('writer', '测试用例编写专家'),
         ('reviewer', '测试评审专家'),

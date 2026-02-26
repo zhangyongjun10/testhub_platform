@@ -113,7 +113,9 @@ export default {
       anthropic: 'Anthropic',
       google_gemini: 'Google Gemini',
       deepseek: 'DeepSeek',
-      siliconflow: '硅基流动 (SiliconFlow)',
+      qwen: '通义千问',
+      kimi: '月之暗面',
+      siliconflow: '硅基流动',
       zhipu: '智谱',
       other: '其他 (Other)'
     },
@@ -178,6 +180,7 @@ export default {
     modelTypes: {
       deepseek: 'DeepSeek',
       qwen: '通义千问',
+      kimi: '月之暗面',
       siliconflow: '硅基流动',
       zhipu: '智谱',
       other: '其他'
