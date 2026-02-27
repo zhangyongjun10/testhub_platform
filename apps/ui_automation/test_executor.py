@@ -260,10 +260,15 @@ class TestExecutor:
                     elif self.browser == 'safari':
                         browser = p.webkit.launch(headless=self.headless)
                     else:  # chrome or edge
-                        # 添加防检测参数
+                        # 添加防检测参数和忽略证书错误参数
                         browser = p.chromium.launch(
                             headless=self.headless,
-                            args=['--disable-blink-features=AutomationControlled']
+                            args=[
+                                '--disable-blink-features=AutomationControlled',
+                                '--ignore-certificate-errors',
+                                '--ignore-ssl-errors',
+                                '--ignore-certificate-errors-spki-list'
+                            ]
                         )
 
                     print(f"✓ 浏览器已启动")
@@ -314,6 +319,7 @@ class TestExecutor:
                             continue
 
                     # 执行测试用例（不再传递page参数，使用self.current_page）
+                    print(f"🔍 准备执行用例，检查 self.current_page: {self.current_page is not None}")
                     case_result = self.execute_test_case_playwright_no_db(case_data)
                     self.results.append(case_result)
                     print(f"✓ 用例执行完成，状态: {case_result['status']}")
@@ -398,6 +404,12 @@ class TestExecutor:
         }
 
         try:
+            print(f"🔍 execute_test_case_playwright_no_db 开始执行用例: {case_data['name']}")
+            print(f"   self.current_page 状态: {self.current_page is not None}")
+            if self.current_page:
+                print(f"   当前页面URL: {self.current_page.url}")
+                print(f"   当前页面标题: {self.current_page.title()}")
+
             # 遍历预先准备好的步骤数据
             just_switched_tab = False  # 跟踪是否刚切换了标签页
             for step_data in case_data['steps']:
@@ -443,6 +455,11 @@ class TestExecutor:
                     # 捕获失败截图（改进版）
                     try:
                         import base64
+                        # 检查页面对象是否有效
+                        if not self.current_page:
+                            print(f"⚠️  self.current_page 为 None，无法截图")
+                            raise Exception("页面对象已失效")
+
                         # 增加超时设置，避免截图等待时间过长
                         print(f"🔍 开始捕获失败截图 (步骤 {step_data['step_number']})...")
                         print(f"   当前page对象URL: {self.current_page.url}")
@@ -481,6 +498,46 @@ class TestExecutor:
                         })
 
                     break
+
+            # 所有步骤都成功，捕获最终截图
+            if result['status'] == 'passed':
+                try:
+                    # 检查页面对象是否有效
+                    if not self.current_page:
+                        print(f"⚠️  self.current_page 为 None，无法捕获成功截图")
+                        raise Exception("页面对象已失效")
+
+                    # 等待页面跳转完成（2秒）
+                    import time
+                    print(f"⏱️  等待页面跳转完成...")
+                    time.sleep(2)
+
+                    import base64
+                    print(f"🔍 开始捕获成功截图...")
+                    print(f"   当前page对象URL: {self.current_page.url}")
+                    print(f"   当前page对象标题: {self.current_page.title()}")
+
+                    screenshot_bytes = self.current_page.screenshot(timeout=5000)
+                    print(f"   截图字节大小: {len(screenshot_bytes)} bytes")
+
+                    screenshot_base64 = base64.b64encode(screenshot_bytes).decode('utf-8')
+                    print(f"   Base64 编码大小: {len(screenshot_base64)} characters")
+
+                    if len(screenshot_base64) >= 100:
+                        screenshot_url = f'data:image/png;base64,{screenshot_base64}'
+                        result['screenshots'].append({
+                            'url': screenshot_url,
+                            'description': '测试执行成功 - 最终页面截图',
+                            'step_number': len(case_data['steps']) + 1,
+                            'timestamp': datetime.now().isoformat()
+                        })
+                        print(f"✓ 成功截图已捕获")
+                        print(f"   截图 URL 长度: {len(screenshot_url)} characters")
+                except Exception as screenshot_error:
+                    error_msg = f"捕获成功截图失败: {str(screenshot_error)}"
+                    print(f"⚠️  {error_msg}")
+                    import traceback
+                    print(f"   详细错误:\n{traceback.format_exc()}")
 
         except Exception as e:
             result['status'] = 'failed'
@@ -1773,6 +1830,36 @@ class TestExecutor:
                         print(f"捕获失败截图失败: {str(screenshot_error)}")
 
                     break
+
+            # 所有步骤都成功，捕获最终截图
+            if result['status'] == 'passed':
+                try:
+                    # 等待页面跳转完成（2秒）
+                    import time
+                    print(f"⏱️  等待页面跳转完成...")
+                    time.sleep(2)
+
+                    import base64
+                    print(f"🔍 开始捕获成功截图...")
+                    screenshot_bytes = driver.get_screenshot_as_png()
+                    print(f"   截图字节大小: {len(screenshot_bytes)} bytes")
+
+                    screenshot_base64 = base64.b64encode(screenshot_bytes).decode()
+                    print(f"   Base64 编码大小: {len(screenshot_base64)} characters")
+
+                    if len(screenshot_base64) >= 100:
+                        result['screenshots'].append({
+                            'url': f'data:image/png;base64,{screenshot_base64}',
+                            'description': '测试执行成功 - 最终页面截图',
+                            'step_number': len(case_data['steps']) + 1,
+                            'timestamp': datetime.now().isoformat()
+                        })
+                        print(f"✓ 成功截图已捕获")
+                except Exception as screenshot_error:
+                    error_msg = f"捕获成功截图失败: {str(screenshot_error)}"
+                    print(f"⚠️  {error_msg}")
+                    import traceback
+                    print(f"   详细错误:\n{traceback.format_exc()}")
 
         except Exception as e:
             result['status'] = 'failed'
