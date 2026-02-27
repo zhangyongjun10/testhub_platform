@@ -206,11 +206,12 @@ class PlaywrightTestEngine:
 
             # 计算超时时间：优先使用元素的wait_timeout（秒），其次使用步骤的wait_time（毫秒）
             # 如果元素有wait_timeout，转换为毫秒；否则使用步骤的wait_time
+            # 确保超时时间至少 5000ms（5秒），避免因等待时间过短导致失败
             element_wait_timeout = element_data.get('wait_timeout')  # 秒
             if element_wait_timeout is not None and element_wait_timeout > 0:
-                timeout_ms = element_wait_timeout * 1000  # 转换为毫秒
+                timeout_ms = max(element_wait_timeout * 1000, 5000)  # 转换为毫秒，至少5秒
             elif step.wait_time:
-                timeout_ms = step.wait_time
+                timeout_ms = max(step.wait_time, 5000)  # 至少5秒
             else:
                 timeout_ms = 5000  # 默认5秒
 

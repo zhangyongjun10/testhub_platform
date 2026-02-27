@@ -388,10 +388,9 @@ class SeleniumTestEngine:
                 return True, log, screenshot_base64
 
             elif action_type == 'switchTab':
-                # 切换标签页
-                # 获取超时时间
+                # 切换标签页，确保超时时间至少5秒
                 if step.wait_time:
-                    timeout = step.wait_time / 1000
+                    timeout = max(step.wait_time / 1000, 5.0)
                 else:
                     timeout = 5.0
                 
@@ -456,12 +455,12 @@ class SeleniumTestEngine:
             # 获取强制操作选项
             force_action = element_data.get('force_action', False)
 
-            # 计算超时时间
+            # 计算超时时间，确保至少5秒
             element_wait_timeout = element_data.get('wait_timeout')
             if element_wait_timeout is not None and element_wait_timeout > 0:
-                timeout_seconds = element_wait_timeout
+                timeout_seconds = max(element_wait_timeout, 5)
             elif step.wait_time:
-                timeout_seconds = step.wait_time / 1000
+                timeout_seconds = max(step.wait_time / 1000, 5)
             else:
                 timeout_seconds = 5
 

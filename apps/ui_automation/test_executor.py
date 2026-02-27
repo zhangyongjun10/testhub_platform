@@ -237,10 +237,82 @@ class TestExecutor:
             )
             case_executions[case_data['id']] = case_execution
 
-        # 执行每个测试用例，为每个用例单独启动和关闭浏览器
+        # 执行每个测试用例，复用同一个浏览器上下文避免重复登录
         print(f"准备执行 {len(test_cases_data)} 个测试用例")
 
         with sync_playwright() as p:
+            # 只启动一次浏览器
+            if self.browser == 'firefox':
+                browser = p.firefox.launch(headless=self.headless)
+            elif self.browser == 'safari':
+                browser = p.webkit.launch(headless=self.headless)
+            else:  # chrome or edge
+                # 添加防检测参数和忽略证书错误参数
+                browser = p.chromium.launch(
+                    headless=self.headless,
+                    args=[
+                        '--disable-blink-features=AutomationControlled',
+                        '--ignore-certificate-errors',
+                        '--ignore-ssl-errors',
+                        '--ignore-certificate-errors-spki-list'
+                    ]
+                )
+            print(f"✓ 浏览器已启动")
+
+            # 只创建一次上下文和页面
+            self.context = browser.new_context(
+                viewport={'width': 1920, 'height': 1080},
+                user_agent='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36'
+            )
+            self.current_page = self.context.new_page()
+            print(f"✓ 浏览器上下文已创建")
+
+            # 导航到项目基础URL
+            if self.test_suite.project.base_url:
+                try:
+                    print(f"正在导航到: {self.test_suite.project.base_url}")
+
+                    # 检测是否在Linux服务器环境
+                    import platform
+                    is_linux = platform.system() == 'Linux'
+
+                    # 使用 networkidle 等待页面加载完成
+                    self.current_page.goto(self.test_suite.project.base_url, wait_until='networkidle',
+                                                   timeout=30000)
+
+                    # 额外等待，确保动态内容加载（Vue/React等SPA应用）
+                    # 服务器无头模式需要更长的等待时间
+                    extra_wait = 3 if is_linux else 2
+                    time.sleep(extra_wait)
+
+                    print(
+                        f"✓ 成功导航到: {self.test_suite.project.base_url} (已等待页面加载完成，额外{extra_wait}秒)")
+                except Exception as e:
+                    print(f"✗ 导航失败: {str(e)}")
+                    # 导航失败，所有用例都失败
+                    for case_data in test_cases_data:
+                        self.results.append({
+                            'test_case_id': case_data['id'],
+                            'test_case_name': case_data['name'],
+                            'status': 'failed',
+                            'steps': [],
+                            'error': f"导航到基础URL失败: {str(e)}",
+                            'start_time': datetime.now().isoformat(),
+                            'end_time': datetime.now().isoformat(),
+                            'screenshots': []
+                        })
+                        failed += 1
+                        # 更新执行记录
+                        case_execution = case_executions[case_data['id']]
+                        case_execution.status = 'failed'
+                        case_execution.started_at = timezone.now()
+                        case_execution.finished_at = timezone.now()
+                        case_execution.error_message = f"导航到基础URL失败: {str(e)}"
+                        case_execution.save()
+                    browser.close()
+                    return
+
+            # 遍历执行每个测试用例（复用同一个上下文）
             for i, case_data in enumerate(test_cases_data, 1):
                 print(f"\n{'=' * 60}")
                 print(f"正在执行第 {i}/{len(test_cases_data)} 个用例: {case_data['name']}")
@@ -252,74 +324,10 @@ class TestExecutor:
                 case_execution.status = 'running'
                 case_execution.save()
 
-                # 为每个测试用例启动新的浏览器实例
                 try:
-                    # 选择浏览器
-                    if self.browser == 'firefox':
-                        browser = p.firefox.launch(headless=self.headless)
-                    elif self.browser == 'safari':
-                        browser = p.webkit.launch(headless=self.headless)
-                    else:  # chrome or edge
-                        # 添加防检测参数和忽略证书错误参数
-                        browser = p.chromium.launch(
-                            headless=self.headless,
-                            args=[
-                                '--disable-blink-features=AutomationControlled',
-                                '--ignore-certificate-errors',
-                                '--ignore-ssl-errors',
-                                '--ignore-certificate-errors-spki-list'
-                            ]
-                        )
-
-                    print(f"✓ 浏览器已启动")
-
-                    # 配置上下文（User Agent 和 Viewport）
-                    self.context = browser.new_context(
-                        viewport={'width': 1920, 'height': 1080},
-                        user_agent='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36'
-                    )
-                    self.current_page = self.context.new_page()
-
-                    # 导航到项目基础URL
-                    if self.test_suite.project.base_url:
-                        try:
-                            print(f"正在导航到: {self.test_suite.project.base_url}")
-
-                            # 检测是否在Linux服务器环境
-                            import platform
-                            is_linux = platform.system() == 'Linux'
-
-                            # 使用 networkidle 等待页面加载完成
-                            self.current_page.goto(self.test_suite.project.base_url, wait_until='networkidle',
-                                                   timeout=30000)
-
-                            # 额外等待，确保动态内容加载（Vue/React等SPA应用）
-                            # 服务器无头模式需要更长的等待时间
-                            extra_wait = 3 if is_linux else 2
-                            time.sleep(extra_wait)
-
-                            print(
-                                f"✓ 成功导航到: {self.test_suite.project.base_url} (已等待页面加载完成，额外{extra_wait}秒)")
-                        except Exception as e:
-                            print(f"✗ 导航失败: {str(e)}")
-                            # 导航失败，记录错误并继续下一个用例
-                            self.results.append({
-                                'test_case_id': case_data['id'],
-                                'test_case_name': case_data['name'],
-                                'status': 'failed',
-                                'steps': [],
-                                'error': f"导航到基础URL失败: {str(e)}",
-                                'start_time': datetime.now().isoformat(),
-                                'end_time': datetime.now().isoformat(),
-                                'screenshots': []
-                            })
-                            failed += 1
-                            browser.close()
-                            print(f"✓ 浏览器已关闭")
-                            continue
-
-                    # 执行测试用例（不再传递page参数，使用self.current_page）
+                    # 执行测试用例（复用 self.current_page）
                     print(f"🔍 准备执行用例，检查 self.current_page: {self.current_page is not None}")
+                    print(f"📌 当前页面 URL: {self.current_page.url}")
                     case_result = self.execute_test_case_playwright_no_db(case_data)
                     self.results.append(case_result)
                     print(f"✓ 用例执行完成，状态: {case_result['status']}")
@@ -370,13 +378,9 @@ class TestExecutor:
                     case_execution.error_message = f"用例执行异常: {str(e)}"
                     case_execution.save()
 
-                finally:
-                    # 确保每个用例执行后都关闭浏览器
-                    try:
-                        browser.close()
-                        print(f"✓ 浏览器已关闭\n")
-                    except:
-                        pass
+            # 所有用例执行完成后，关闭浏览器
+            browser.close()
+            print(f"✓ 浏览器已关闭\n")
 
         # 注意：每个用例的执行记录已在执行过程中实时更新，不需要在这里统一更新
 
