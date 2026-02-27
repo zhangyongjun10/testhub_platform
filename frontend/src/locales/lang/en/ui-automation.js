@@ -94,7 +94,8 @@ export default {
     stop: 'Stop',
     rerun: 'Rerun',
     details: 'Details',
-    query: 'Query'
+    query: 'Query',
+    confirmDelete: 'Confirm Delete'
   },
 
   // Status
@@ -265,7 +266,10 @@ export default {
       updateFailed: 'Failed to update element',
       saveSuccess: 'Element saved successfully',
       saveFailed: 'Failed to save element',
-      deleteConfirm: 'Are you sure to delete "{name}"? This action cannot be undone.',
+      confirmDelete: 'Are you sure to delete element "{name}"? This action cannot be undone.',
+      noElementSelected: 'Please select an element to delete',
+      noPageSelected: 'Please select a page to delete',
+      confirmDeletePage: 'Are you sure to delete page "{name}"? This action cannot be undone.',
       deleteConfirmTitle: 'Confirm Delete',
       deleteSuccess: 'Element deleted successfully',
       deleteFailed: 'Failed to delete',
@@ -274,6 +278,7 @@ export default {
       pageUpdateSuccess: 'Page updated successfully',
       pageUpdateFailed: 'Failed to update page',
       pageDeleteSuccess: 'Page deleted successfully',
+      pageDeleteFailed: 'Failed to delete page',
       validateSuccess: 'Element locator validation passed',
       validateFailed: 'Validation failed',
       elementsLoaded: 'Loaded {count} elements',

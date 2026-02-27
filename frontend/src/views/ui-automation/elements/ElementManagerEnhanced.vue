@@ -103,6 +103,9 @@
               <el-button size="small" @click="saveElement" :loading="saving" ref="saveButtonRef">
                 {{ $t('uiAutomation.common.save') }}
               </el-button>
+              <el-button size="small" type="danger" @click="deleteCurrentElement" :loading="saving" v-if="selectedElement && selectedElement.id">
+                {{ $t('uiAutomation.common.delete') }}
+              </el-button>
             </div>
           </div>
 
@@ -251,6 +254,7 @@
 
       <template #footer>
         <el-button @click="showEditPageDialog = false">{{ $t('uiAutomation.common.cancel') }}</el-button>
+        <el-button type="danger" @click="deleteCurrentPage" :loading="saving">{{ $t('uiAutomation.common.delete') }}</el-button>
         <el-button type="primary" @click="updatePage">{{ $t('uiAutomation.common.save') }}</el-button>
       </template>
     </el-dialog>
@@ -962,6 +966,41 @@ const saveElement = async () => {
   }
 }
 
+// 删除当前选中的元素
+const deleteCurrentElement = async () => {
+  if (!selectedElement.value || !selectedElement.value.id) {
+    ElMessage.warning(t('uiAutomation.element.messages.noElementSelected'))
+    return
+  }
+
+  try {
+    await ElMessageBox.confirm(
+      t('uiAutomation.element.messages.confirmDelete', { name: selectedElement.value.name }),
+      t('uiAutomation.common.confirmDelete'),
+      {
+        type: 'warning',
+        confirmButtonText: t('uiAutomation.common.confirm'),
+        cancelButtonText: t('uiAutomation.common.cancel')
+      }
+    )
+
+    saving.value = true
+    await deleteElement(selectedElement.value.id)
+    ElMessage.success(t('uiAutomation.element.messages.deleteSuccess'))
+
+    // 清空选中
+    selectedElement.value = null
+
+    // 重新加载元素树
+    await loadElementTree()
+  } catch (error) {
+    console.error('删除元素失败:', error)
+    ElMessage.error(t('uiAutomation.element.messages.deleteFailed'))
+  } finally {
+    saving.value = false
+  }
+}
+
 // 验证元素
 const validateElement = async () => {
   if (!selectedElement.value) return
@@ -1186,6 +1225,53 @@ const updatePage = async () => {
   } catch (error) {
     console.error('更新页面失败:', error)
     ElMessage.error(t('uiAutomation.element.messages.pageUpdateFailed'))
+  }
+}
+
+// 删除当前编辑的页面
+const deleteCurrentPage = async () => {
+  if (!editPageForm.id) {
+    ElMessage.warning(t('uiAutomation.element.messages.noPageSelected'))
+    return
+  }
+
+  try {
+    await ElMessageBox.confirm(
+      t('uiAutomation.element.messages.confirmDeletePage', { name: editPageForm.name }),
+      t('uiAutomation.common.confirmDelete'),
+      {
+        type: 'warning',
+        confirmButtonText: t('uiAutomation.common.confirm'),
+        cancelButtonText: t('uiAutomation.common.cancel')
+      }
+    )
+
+    saving.value = true
+    await deleteElementGroup(editPageForm.id)
+    ElMessage.success(t('uiAutomation.element.messages.pageDeleteSuccess'))
+
+    // 关闭对话框
+    showEditPageDialog.value = false
+
+    // 清空表单
+    editPageForm.id = null
+    editPageForm.name = ''
+    editPageForm.description = ''
+    editPageForm.parent_page = null
+
+    // 重新加载页面和树
+    await Promise.all([
+      loadPages(),
+      loadElementTree()
+    ])
+
+    // 强制刷新树组件
+    treeKey.value += 1
+  } catch (error) {
+    console.error('删除页面失败:', error)
+    ElMessage.error(t('uiAutomation.element.messages.pageDeleteFailed'))
+  } finally {
+    saving.value = false
   }
 }
 </script>

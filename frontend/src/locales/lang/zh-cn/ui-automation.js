@@ -94,7 +94,8 @@ export default {
     stop: '停止',
     rerun: '重跑',
     details: '详情',
-    query: '查询'
+    query: '查询',
+    confirmDelete: '确认删除'
   },
 
   // 状态
@@ -265,7 +266,10 @@ export default {
       updateFailed: '元素更新失败',
       saveSuccess: '元素保存成功',
       saveFailed: '元素保存失败',
-      deleteConfirm: '确定要删除 "{name}" 吗？此操作不可恢复。',
+      confirmDelete: '确定要删除元素 "{name}" 吗？此操作不可恢复。',
+      noElementSelected: '请先选择要删除的元素',
+      noPageSelected: '请先选择要删除的页面',
+      confirmDeletePage: '确定要删除页面 "{name}" 吗？此操作不可恢复。',
       deleteConfirmTitle: '确认删除',
       deleteSuccess: '元素删除成功',
       deleteFailed: '删除失败',
@@ -274,6 +278,7 @@ export default {
       pageUpdateSuccess: '页面更新成功',
       pageUpdateFailed: '页面更新失败',
       pageDeleteSuccess: '页面删除成功',
+      pageDeleteFailed: '删除页面失败',
       validateSuccess: '元素定位器验证通过',
       validateFailed: '验证失败',
       elementsLoaded: '已加载 {count} 个元素',
