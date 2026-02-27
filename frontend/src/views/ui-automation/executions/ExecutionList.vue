@@ -185,8 +185,8 @@
             </div>
           </el-tab-pane>
 
-          <!-- 失败截图 - 仅失败或错误状态显示 -->
-          <el-tab-pane :label="$t('uiAutomation.execution.failedScreenshots')" name="screenshots" v-if="currentExecution.status === 'failed' || currentExecution.status === 'error'">
+          <!-- 截图 - 成功、失败或错误状态都显示 -->
+          <el-tab-pane :label="$t('uiAutomation.execution.executionResultScreenshots')" name="screenshots" v-if="currentExecution.screenshots && currentExecution.screenshots.length > 0">
             <div class="screenshots-container">
               <div v-if="currentExecution.screenshots && currentExecution.screenshots.length > 0">
                 <div v-for="(screenshot, index) in currentExecution.screenshots" :key="index" class="screenshot-item">

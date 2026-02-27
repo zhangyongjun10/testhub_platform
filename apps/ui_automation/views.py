@@ -1524,6 +1524,25 @@ class TestCaseViewSet(viewsets.ModelViewSet):
                                     return False
 
                             execution_logs.append(f"========== 执行完成 ({step_count} 个步骤全部通过) ==========")
+                            
+                            # 测试执行成功，等待页面稳定后捕获最终截图
+                            import time
+                            execution_logs.append("  ⏱ 等待页面跳转完成...")
+                            time.sleep(2)
+                            
+                            try:
+                                screenshot_base64 = engine.capture_screenshot()
+                                if screenshot_base64:
+                                    screenshots.append({
+                                        'url': screenshot_base64,
+                                        'description': '测试执行成功 - 最终页面截图',
+                                        'step_number': step_count + 1,
+                                        'timestamp': timezone.now().isoformat()
+                                    })
+                                    execution_logs.append(f"  📸 测试成功截图已捕获")
+                            except Exception as e:
+                                execution_logs.append(f"  ⚠ 截图失败: {str(e)}")
+                            
                             return True
                         else:
                             execution_logs.append("警告: 测试用例没有定义任何步骤")
@@ -1744,6 +1763,25 @@ class TestCaseViewSet(viewsets.ModelViewSet):
 
                                 # 所有步骤都成功
                                 execution_logs.append(f"========== 执行完成 ({step_count} 个步骤全部通过) ==========")
+                                
+                                # 测试执行成功，等待页面稳定后捕获最终截图
+                                import asyncio
+                                execution_logs.append("  ⏱ 等待页面跳转完成...")
+                                await asyncio.sleep(2)
+                                
+                                try:
+                                    screenshot_base64 = await engine.capture_screenshot()
+                                    if screenshot_base64:
+                                        screenshots.append({
+                                            'url': screenshot_base64,
+                                            'description': '测试执行成功 - 最终页面截图',
+                                            'step_number': step_count + 1,
+                                            'timestamp': timezone.now().isoformat()
+                                        })
+                                        execution_logs.append(f"  📸 测试成功截图已捕获")
+                                except Exception as e:
+                                    execution_logs.append(f"  ⚠ 截图失败: {str(e)}")
+                                
                                 return True
 
                             else:
