@@ -562,6 +562,16 @@ const buildRequestTree = (collections, requests) => {
   const map = {}
   const roots = []
   
+  // 创建"未分类"集合节点（用于存放没有关联集合的请求）
+  const uncategorizedNode = {
+    id: 'uncategorized',
+    name: '未分类',
+    type: 'collection',
+    children: []
+  }
+  roots.push(uncategorizedNode)
+  map['uncategorized'] = uncategorizedNode
+  
   // 创建集合节点
   collections.forEach(collection => {
     map[collection.id] = {
@@ -582,8 +592,9 @@ const buildRequestTree = (collections, requests) => {
   
   // 添加请求到对应集合
   requests.forEach(request => {
-    if (map[request.collection]) {
-      map[request.collection].children.push({
+    const collectionId = request.collection || 'uncategorized'
+    if (map[collectionId]) {
+      map[collectionId].children.push({
         ...request,
         type: 'request',
         id: `request_${request.id}`

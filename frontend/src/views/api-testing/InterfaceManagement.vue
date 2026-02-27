@@ -1627,6 +1627,11 @@ const sendRequest = async () => {
     return
   }
 
+  if (!selectedRequest.value.id) {
+    ElMessage.warning('请先保存接口后再发送测试')
+    return
+  }
+
   try {
     sending.value = true
 

@@ -73,14 +73,14 @@
           <p>{{ $t('home.dataFactoryDesc') }}</p>
         </div>
 
-        <!-- APP自动化测试 -->
-        <div class="nav-card" @click="handleNavigate('app')" role="button" tabindex="0">
+        <!-- APP自动化测试 - 已屏蔽 -->
+        <!-- <div class="nav-card" @click="handleNavigate('app')" role="button" tabindex="0">
           <div class="card-icon app-icon">
             <el-icon><Cellphone /></el-icon>
           </div>
           <h3>APP自动化测试</h3>
           <p>基于Airtest的Android APP自动化测试</p>
-        </div>
+        </div> -->
 
         <!-- AI 智能模式 -->
         <div class="nav-card" @click="handleNavigate('ai-intelligent')" role="button" tabindex="0">

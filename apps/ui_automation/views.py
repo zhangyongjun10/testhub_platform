@@ -1570,16 +1570,31 @@ class TestCaseViewSet(viewsets.ModelViewSet):
                             execution_logs.append("")
 
                             # 导航到项目基础URL
+                            execution_logs.append(f"[调试] 检查 base_url...")
+                            execution_logs.append(f"[调试] base_url = '{test_case.project.base_url}'")
+                            execution_logs.append(f"[调试] base_url 是否为空: {not test_case.project.base_url}")
+
                             if test_case.project.base_url:
                                 execution_logs.append("========== 导航到测试页面 ==========")
-                                success, nav_log = await engine.navigate(test_case.project.base_url)
-                                execution_logs.append(nav_log)
-                                execution_logs.append("")
+                                execution_logs.append(f"[调试] 开始导航到: {test_case.project.base_url}")
+                                
+                                try:
+                                    success, nav_log = await engine.navigate(test_case.project.base_url)
+                                    execution_logs.append(f"[调试] 导航结果: success={success}")
+                                    execution_logs.append(nav_log)
+                                    execution_logs.append("")
 
-                                if not success:
+                                    if not success:
+                                        execution_result['status'] = 'failed'
+                                        execution_result['error_message'] = f"导航到测试页面失败: {nav_log}"
+                                        return False
+                                except Exception as e:
+                                    execution_logs.append(f"[调试] 导航异常: {str(e)}")
                                     execution_result['status'] = 'failed'
-                                    execution_result['error_message'] = "导航到测试页面失败"
+                                    execution_result['error_message'] = f"导航异常: {str(e)}"
                                     return False
+                            else:
+                                execution_logs.append("[调试] base_url 为空，跳过导航")
 
                             if steps_data:
                                 execution_logs.append("========== 执行测试步骤 ==========")
